@@ -34,7 +34,7 @@ const Hero = () => {
     minHeight: '100vh',
     backgroundColor: '#0a0a0a',
     overflow: 'hidden',
-    isolation: 'isolate', // important
+    isolation: 'isolate',
     '--grid-size': '100px',
     '--grid-color': 'rgba(163, 230, 53, 0.03)',
   } as CSSProperties;
@@ -56,44 +56,22 @@ const Hero = () => {
         }}
       />
 
-      {/* BACKGROUND TYPOGRAPHY LAYER */}
+      {/* BACKGROUND TYPOGRAPHY */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* DESIGNER — stays behind image */}
         <motion.div
-          className="
-            absolute
-            top-[14%]
-            left-[-2%]
-            text-[14vw]
-            md:text-[12vw]
-            font-extrabold
-            tracking-[0.14em]
-            text-white/10
-            leading-none
-            uppercase
-            z-[2]
-          "
+          className="absolute top-[10%] left-[-2%] text-[14vw] md:text-[12vw]
+                     font-extrabold tracking-[0.14em]
+                     text-white/10 uppercase z-[2]"
           animate={{ x: [0, 24, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
         >
           DESIGNER
         </motion.div>
 
-        {/* PORTFOLIO — ABOVE IMAGE */}
         <motion.div
-          className="
-            absolute
-            bottom-[6%]
-            right-[-4%]
-            text-[13vw]
-            md:text-[11vw]
-            font-extrabold
-            tracking-[0.16em]
-            text-white/15
-            leading-none
-            uppercase
-            z-[30]
-          "
+          className="absolute bottom-[6%] right-[-4%] text-[13vw] md:text-[11vw]
+                     font-extrabold tracking-[0.16em]
+                     text-white/15 uppercase z-[30]"
           animate={{ x: [0, -28, 0] }}
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -104,33 +82,48 @@ const Hero = () => {
       {/* MAIN CONTENT */}
       <div className="relative z-10 container mx-auto px-6 h-full flex items-center">
         <div className="grid lg:grid-cols-2 gap-20 items-center w-full max-w-7xl mx-auto">
+
           {/* LEFT CONTENT */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="h-12 overflow-hidden mb-4">
+            {/* GREETING — micro fade + blur + baseline aligned */}
+            <div className="h-12 flex items-end mb-4">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={greetingIndex}
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -30, opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-xl text-lime-400 font-mono"
+                  initial={{ opacity: 0, y: 12, filter: 'blur(6px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, y: -12, filter: 'blur(6px)' }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.25, 0.1, 0.25, 1]
+                  }}
+                  className="text-lg md:text-xl text-lime-400/90 tracking-wide"
+                  style={{
+                    fontFamily: '"Dancing Script", cursive',
+                    textTransform: 'none',
+                    letterSpacing: '0.02em',
+                    fontWeight: 500,
+                    lineHeight: '1.2',
+                    display: 'inline-block',
+                    transform: 'translateZ(0)' // Force GPU acceleration
+                  }}
                 >
-                  {greetings[greetingIndex]}, I’m
+                  {greetings[greetingIndex]}, I'm
                 </motion.span>
               </AnimatePresence>
             </div>
 
             <h1 className="text-6xl md:text-8xl font-bold text-white leading-none">
-              ANISH
+              PRAVEENA
             </h1>
 
-            <div className="relative inline-block mt-4">
-              <span className="text-2xl md:text-3xl text-gray-300 font-light">
+            {/* DESIGNER ROLE */}
+            <div className="relative inline-block mt-3 -translate-y-3">
+              <span className="text-lg md:text-xl text-gray-300 font-light">
                 UI/UX & Product Designer
               </span>
               <span className="absolute left-0 -bottom-1 w-full h-[2px] bg-lime-400/30" />
@@ -141,57 +134,117 @@ const Hero = () => {
               interactions.
             </p>
 
-            <div className="flex gap-4 mt-12">
-              <button className="px-8 py-3 bg-lime-400 text-black font-medium">
-                View Work
-              </button>
-              <button className="px-8 py-3 border border-lime-400 text-white">
-                Contact
-              </button>
-            </div>
+            {/* BUTTONS */}
+            <motion.div className="flex gap-4 mt-12">
+              <motion.button 
+                className="px-8 py-3 font-medium text-black relative overflow-hidden group"
+                style={{
+                  background: 'linear-gradient(135deg, #a3e635, #84cc16)',
+                  borderRadius: '16px 16px 16px 4px',
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                }}
+                whileHover={{
+                  y: -2,
+                  transition: { type: 'spring', stiffness: 400, damping: 10 }
+                }}
+              >
+                <span className="relative z-10">View Work</span>
+                <motion.span 
+                  className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100"
+                  style={{ borderRadius: 'inherit' }}
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 0.1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.button>
 
-            <div className="flex gap-4 mt-8">
+              <motion.button 
+                className="px-8 py-3 font-medium text-lime-400 relative"
+                style={{
+                  borderRadius: '16px 4px 16px 16px',
+                  background: 'rgba(163, 230, 53, 0.08)',
+                  backdropFilter: 'blur(4px)',
+                  border: '1px solid rgba(163, 230, 53, 0.2)',
+                }}
+                whileHover={{
+                  y: -2,
+                  background: 'rgba(163, 230, 53, 0.12)',
+                  transition: { type: 'spring', stiffness: 400, damping: 10 }
+                }}
+              >
+                <span className="relative z-10">Contact</span>
+                <motion.div 
+                  className="absolute inset-0 bg-lime-400/5 opacity-0 group-hover:opacity-100"
+                  style={{ borderRadius: 'inherit' }}
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.button>
+            </motion.div>
+
+            {/* SOCIAL ICONS */}
+            <div className="flex gap-5 mt-8">
               {socialLinks.map(({ icon: Icon, href, label }) => (
-                <a
+                <motion.a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 flex items-center justify-center border border-gray-800 text-gray-300 hover:text-white transition"
+                  className="group w-11 h-11 flex items-center justify-center text-gray-400 hover:text-lime-400"
+                  whileHover={{ 
+                    y: -2,
+                    transition: { type: 'spring', stiffness: 400, damping: 10 }
+                  }}
                 >
-                  <Icon size={18} />
-                </a>
+                  <div className="absolute w-11 h-11 rounded-full bg-white/5 border border-white/5 group-hover:border-lime-400/20 group-hover:bg-lime-400/5 transition-all duration-300 flex items-center justify-center">
+                    <Icon size={18} className="relative z-10" />
+                  </div>
+                  <motion.div 
+                    className="absolute w-11 h-11 rounded-full bg-lime-400/10 opacity-0 group-hover:opacity-100"
+                    style={{ filter: 'blur(8px)' }}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ 
+                      scale: 1.2, 
+                      opacity: 1,
+                      transition: { duration: 0.4 }
+                    }}
+                  />
+                </motion.a>
               ))}
             </div>
           </motion.div>
 
-          {/* RIGHT IMAGE (BELOW PORTFOLIO TEXT) */}
+          {/* RIGHT IMAGE */}
           <motion.div
-            className="relative w-full max-w-md mx-auto z-[20]"
+            className="relative w-full max-w-md mx-auto z-[20] mt-10"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div
-              className="relative aspect-[3/4] bg-gradient-to-br from-gray-900 to-gray-800"
-              style={{
-                clipPath:
-                  'polygon(0% 0%, 100% 0%, 100% 80%, 85% 100%, 0% 100%)',
+            <motion.div
+              className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800"
+              animate={{
+                borderRadius: [
+                  '48% 52% 60% 40% / 42% 45% 55% 58%',
+                  '55% 45% 42% 58% / 55% 42% 58% 45%',
+                  '48% 52% 60% 40% / 42% 45% 55% 58%',
+                ],
+              }}
+              transition={{
+                duration: 14,
+                repeat: Infinity,
+                ease: 'easeInOut',
               }}
             >
-              <div className="absolute inset-0 flex items-center justify-center text-white/30">
-                YOUR PHOTO
-              </div>
-
-              <div
-                className="absolute inset-0 border border-gray-700/40"
-                style={{
-                  clipPath:
-                    'polygon(0% 0%, 100% 0%, 100% 80%, 85% 100%, 0% 100%)',
-                }}
+              <img
+                src="/dummy-photo.jpg"
+                alt="Profile"
+                className="w-full h-full object-cover"
               />
-            </div>
+            </motion.div>
           </motion.div>
+
         </div>
       </div>
     </section>
