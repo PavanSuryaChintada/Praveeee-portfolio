@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import BrandsMarquee from '@/components/BrandsMarquee';
@@ -27,13 +27,15 @@ const Index = () => {
   }, []);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [showBrand, setShowBrand] = useState(false);
+  const brandRef = useRef<HTMLSpanElement>(null);
 
   return (
     <>
-      {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+      {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} brandRef={brandRef} setShowBrand={setShowBrand} />}
       <div className={`min-h-screen bg-background text-foreground ${isLoading ? 'hidden' : ''}`}>
         <CustomCursor />
-        <Navigation />
+        <Navigation ref={brandRef} showBrand={showBrand} />
         <Hero />
         <BrandsMarquee />
         <BentoGrid />
