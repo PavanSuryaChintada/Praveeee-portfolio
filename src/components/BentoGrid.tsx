@@ -1,8 +1,126 @@
-import { motion, useTransform, useSpring, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { motion, useTransform, useSpring, useMotionValue, AnimatePresence } from 'framer-motion';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Palette, PenTool, Layers, Code, ArrowRight, Sparkles } from 'lucide-react';
 
-// Abstract shape component for visual interest
+// --- TECH SPHERE LOGIC ---
+
+const techLogos = [
+  { name: "React", url: "https://cdn.simpleicons.org/react/61DAFB" },
+  { name: "Next.js", url: "https://cdn.simpleicons.org/nextdotjs/white" },
+  { name: "TypeScript", url: "https://cdn.simpleicons.org/typescript/3178C6" },
+  { name: "Tailwind", url: "https://cdn.simpleicons.org/tailwindcss/06B6D4" },
+  { name: "Framer", url: "https://cdn.simpleicons.org/framer/black" },
+  { name: "Figma", url: "https://cdn.simpleicons.org/figma/F24E1E" },
+  { name: "Node.js", url: "https://cdn.simpleicons.org/nodedotjs/339933" },
+  { name: "Three.js", url: "https://cdn.simpleicons.org/threedotjs/white" },
+  { name: "Vite", url: "https://cdn.simpleicons.org/vite/646CFF" },
+  { name: "JavaScript", url: "https://cdn.simpleicons.org/javascript/F7DF1E" },
+  { name: "Adobe", url: "https://cdn.simpleicons.org/adobecreativecloud/DA1E1E" },
+  { name: "Git", url: "https://cdn.simpleicons.org/git/F05032" },
+  { name: "OpenAI", url: "https://cdn.simpleicons.org/openai/white" },
+  { name: "Python", url: "https://cdn.simpleicons.org/python/3776AB" },
+  { name: "Vercel", url: "https://cdn.simpleicons.org/vercel/white" },
+];
+
+const SphereItem = ({ item, springX, springY, autoRotation }: { item: any; springX: any; springY: any; autoRotation: number }) => {
+  const rotationX = useTransform(springY, [-1, 1], [30, -30]);
+  const rotationY = useTransform(springX, (val) => val * 35 + autoRotation);
+
+  const opacity = useTransform(rotationY, (val) => {
+    const angle = (val + item.phi) * (Math.PI / 180);
+    const z = Math.cos(angle) * item.radius;
+    const depth = (z + 100) / 200;
+    return Math.max(0.1, depth);
+  });
+
+  const scale = useTransform(opacity, [0.1, 1], [0.5, 1.2]);
+
+  return (
+    <motion.div
+      className="absolute flex items-center justify-center p-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl overflow-hidden"
+      style={{
+        x: useTransform(rotationY, (val) => {
+          const rad = (val + item.phi) * (Math.PI / 180);
+          return Math.cos(rad) * Math.sin(item.theta) * item.radius;
+        }),
+        y: useTransform(rotationX, (val) => {
+          const rad = val * (Math.PI / 180);
+          return Math.cos(item.theta) * item.radius + (Math.sin(rad) * 20);
+        }),
+        opacity,
+        scale,
+        zIndex: Math.round(opacity.get() * 100),
+      }}
+    >
+      <img 
+        src={item.url} 
+        alt={item.name} 
+        className="w-6 h-6 object-contain filter drop-shadow-md"
+        loading="lazy"
+      />
+    </motion.div>
+  );
+};
+
+const TechSphere = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [autoRotation, setAutoRotation] = useState(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springX = useSpring(mouseX, { stiffness: 40, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 40, damping: 20 });
+
+  useEffect(() => {
+    let frameId: number;
+    const animate = () => {
+      // Increased base speed to 0.8 and multiplier to 2.5 for a faster revolution
+      const speed = 0.8 + (Math.abs(mouseX.get()) * 2.5);
+      setAutoRotation((prev) => (prev + speed) % 360);
+      frameId = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    mouseX.set((e.clientX - rect.left - rect.width / 2) / (rect.width / 2));
+    mouseY.set((e.clientY - rect.top - rect.height / 2) / (rect.height / 2));
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  const sphereItems = useMemo(() => {
+    const radius = 115; // Slightly reduced radius to make the rotation feel faster
+    return techLogos.map((logo, i) => {
+      const phi = Math.acos(-1 + (2 * i) / techLogos.length) * (180 / Math.PI);
+      const theta = Math.sqrt(techLogos.length * Math.PI) * phi * (Math.PI / 180);
+      return { ...logo, phi, theta, radius };
+    });
+  }, []);
+
+  return (
+    <div 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative w-full h-full flex items-center justify-center overflow-hidden"
+      style={{ perspective: "1000px" }}
+    >
+      {sphereItems.map((item, i) => (
+        <SphereItem key={i} item={item} springX={springX} springY={springY} autoRotation={autoRotation} />
+      ))}
+    </div>
+  );
+};
+
+// --- BENTO GRID COMPONENTS ---
+
 const AbstractShape = ({ className }: { className?: string }) => (
   <div className={`absolute -z-10 opacity-10 pointer-events-none ${className}`}>
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -15,31 +133,12 @@ const AbstractShape = ({ className }: { className?: string }) => (
   </div>
 );
 
-// Floating capability item component
-const FloatingCapability = ({ children, x, y, delay }: { children: React.ReactNode; x: string; y: string; delay: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.6, delay }}
-    className={`absolute ${x} ${y} bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border text-sm whitespace-nowrap`}
-  >
-    {children}
-  </motion.div>
-);
-
-const StickyCard = ({ children, className = '' }) => {
+const StickyCard = ({ children, className = '' }: { children: React.ReactNode, className?: string }) => {
   const ref = useRef(null);
-  
-  const y = 0;
-const opacity = 1;
-const scale = 1;
-
   return (
     <motion.div 
       ref={ref}
       className={`sticky-element ${className}`}
-      style={{ y, opacity, scale }}
     >
       {children}
     </motion.div>
@@ -48,12 +147,11 @@ const scale = 1;
 
 const BentoGrid = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  
   
   return (
-    <section ref={containerRef} className="relative py-32 px-6 overflow-hidden min-h-[200vh]">
+    <section ref={containerRef} className="relative py-32 px-6 overflow-hidden min-h-[150vh] bg-background">
       <div className="max-w-7xl mx-auto relative z-10">
+        
         {/* Section Header */}
         <motion.div 
           className="text-center mb-24"
@@ -62,40 +160,30 @@ const BentoGrid = () => {
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 
-            className="text-5xl md:text-7xl font-sans font-bold tracking-tight mb-4"
-          >
-            Design <span className="text-primary">Perspective</span>
+          <motion.h2 className="text-5xl md:text-7xl font-sans font-bold tracking-tight mb-4 text-white uppercase italic tracking-tighter">
+            DESIGN<span className="text-[#bef264]"> PERSPECTIVE</span>
           </motion.h2>
-          <motion.p 
-            className="text-lg text-muted-foreground max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-20px" }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
+          <motion.p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             A thoughtful approach to creating meaningful digital experiences
           </motion.p>
         </motion.div>
 
-        {/* Main Grid - Asymmetric Layout */}
         <div className="relative">
-          {/* Abstract Background Shapes */}
-          <AbstractShape className="-top-32 -left-32 w-64 h-64 text-primary" />
-          <AbstractShape className="bottom-0 right-0 w-96 h-96 text-primary/30" />
+          <AbstractShape className="-top-32 -left-32 w-64 h-64 text-[#bef264]" />
+          <AbstractShape className="bottom-0 right-0 w-96 h-96 text-[#bef264]/30" />
 
           {/* Row 1 */}
           <div className="flex flex-col lg:flex-row gap-6 mb-6">
-            {/* Philosophy Card - Large */}
-            <StickyCard className="lg:w-2/3 bg-card/50 backdrop-blur-md rounded-3xl border border-border p-10 relative overflow-hidden">
+            {/* Philosophy Card */}
+            <StickyCard className="lg:w-2/3 bg-card/50 backdrop-blur-md rounded-3xl border border-white/10 p-10 relative overflow-hidden">
               <div className="absolute top-8 right-8 text-8xl opacity-5">
-                <Palette className="w-20 h-20" />
+                <Palette className="w-20 h-20 text-white" />
               </div>
-              <span className="inline-block text-sm font-medium text-primary mb-6">Design Philosophy</span>
-              <h3 className="text-3xl md:text-4xl font-bold leading-tight mb-6">
-                Crafting <span className="text-primary">intuitive</span> experiences that feel <span className="relative">
+              <span className="inline-block text-sm font-medium text-[#bef264] mb-6 uppercase tracking-[0.2em]">Philosophy</span>
+              <h3 className="text-3xl md:text-4xl font-bold leading-tight mb-6 text-white uppercase italic tracking-tighter">
+                Crafting <span className="text-[#bef264]">intuitive</span> experiences that feel <span className="relative">
                   inherently right
-                  <span className="absolute -bottom-1 left-0 w-full h-1 bg-primary/20 -z-10"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#bef264]/20 -z-10"></span>
                 </span>
               </h3>
               <p className="text-lg text-muted-foreground max-w-2xl">
@@ -104,108 +192,97 @@ const BentoGrid = () => {
               </p>
             </StickyCard>
 
-            {/* Capabilities Card - Small */}
-            <StickyCard className="lg:w-1/3 bg-card/80 backdrop-blur-sm rounded-3xl border border-border p-8 relative overflow-hidden mt-12">
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full"></div>
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <Layers className="w-6 h-6 text-primary" />
-                  <h3 className="text-xl font-semibold">Capabilities</h3>
+            {/* Capabilities Card - REVOLVING LOGO SPHERE */}
+            <StickyCard className="lg:w-1/3 bg-card/80 backdrop-blur-sm rounded-3xl border border-white/10 p-8 relative overflow-hidden flex flex-col h-[480px]">
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#bef264]/5 rounded-full"></div>
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <Layers className="w-6 h-6 text-[#bef264]" />
+                  <h3 className="text-sm font-bold text-white uppercase tracking-widest">Capabilities</h3>
                 </div>
-                <div className="relative h-64">
-                  <FloatingCapability x="left-4 top-4" y="top-4" delay={0.1}>UI/UX Design</FloatingCapability>
-                  <FloatingCapability x="right-4 top-12" y="top-12" delay={0.2}>Product Design</FloatingCapability>
-                  <FloatingCapability x="left-8 top-24" y="top-24" delay={0.3}>Brand Identity</FloatingCapability>
-                  <FloatingCapability x="right-8 top-36" y="top-36" delay={0.4}>Design Systems</FloatingCapability>
-                  <FloatingCapability x="left-12 top-48" y="top-48" delay={0.5}>Interaction Design</FloatingCapability>
-                  <FloatingCapability x="right-12 top-56" y="top-56" delay={0.6}>Motion Design</FloatingCapability>
+                
+                <div className="flex-grow">
+                  <TechSphere />
                 </div>
               </div>
             </StickyCard>
           </div>
 
-          {/* Row 2 - Reversed on larger screens */}
+          {/* Row 2 */}
           <div className="flex flex-col lg:flex-row-reverse gap-6">
-            {/* Process Card - Medium */}
-            <StickyCard className="lg:w-1/2 bg-card/60 backdrop-blur-sm rounded-3xl border border-border p-8 relative overflow-hidden">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full"></div>
+            {/* Process Card */}
+            <StickyCard className="lg:w-1/2 bg-card/60 backdrop-blur-sm rounded-3xl border border-white/10 p-8 relative overflow-hidden text-white">
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#bef264]/5 rounded-full"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-8">
-                  <Code className="w-6 h-6 text-primary" />
-                  <h3 className="text-xl font-semibold">Design Process</h3>
+                  <Code className="w-6 h-6 text-[#bef264]" />
+                  <h3 className="text-sm font-bold uppercase tracking-widest">Design Process</h3>
                 </div>
                 <div className="space-y-6">
                   {[
-                    { title: 'Discover', desc: 'Understanding the problem space and user needs through research and analysis.' },
-                    { title: 'Define', desc: 'Articulating clear goals and strategy for the solution.' },
+                    { title: 'Discover', desc: 'Understanding the problem space and user needs.' },
+                    { title: 'Define', desc: 'Articulating clear goals and strategy.' },
                     { title: 'Design', desc: 'Creating and iterating on concepts and prototypes.' },
-                    { title: 'Refine', desc: 'Testing and refining based on feedback and data.' },
-                    { title: 'Deliver', desc: 'Implementing the final solution with attention to detail.' },
+                    { title: 'Refine', desc: 'Testing and refining based on feedback.' },
+                    { title: 'Deliver', desc: 'Implementing final solution with attention to detail.' },
                   ].map((item, i) => (
                     <div key={i} className="group">
                       <div className="flex items-start gap-4">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary mt-0.5 flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-[#bef264]/10 flex items-center justify-center text-sm font-medium text-[#bef264] mt-0.5 flex-shrink-0">
                           {i + 1}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-medium group-hover:text-primary transition-colors">{item.title}</h4>
+                            <h4 className="font-medium group-hover:text-[#bef264] transition-colors">{item.title}</h4>
                             <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all" />
                           </div>
                           <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
                         </div>
                       </div>
-                      {i < 4 && <div className="h-px bg-border/50 my-4 w-10/12 ml-12"></div>}
+                      {i < 4 && <div className="h-px bg-white/5 my-4 w-10/12 ml-12"></div>}
                     </div>
                   ))}
                 </div>
               </div>
             </StickyCard>
 
-            {/* Values & Signature - Stacked */}
+            {/* Values & Signature */}
             <div className="lg:w-1/2 flex flex-col gap-6">
-              {/* Values Card */}
-              <StickyCard className="bg-card/70 backdrop-blur-sm rounded-3xl border border-border p-8 flex-1 relative overflow-hidden">
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/5 rounded-full"></div>
+              <StickyCard className="bg-card/70 backdrop-blur-sm rounded-3xl border border-white/10 p-8 flex-1 relative overflow-hidden text-white">
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#bef264]/5 rounded-full"></div>
                 <div className="relative z-10 h-full flex flex-col">
                   <div className="flex items-center gap-3 mb-8">
-                    <PenTool className="w-6 h-6 text-primary" />
-                    <h3 className="text-xl font-semibold">Core Values</h3>
+                    <PenTool className="w-6 h-6 text-[#bef264]" />
+                    <h3 className="text-sm font-bold uppercase tracking-widest">Core Values</h3>
                   </div>
-                  <div className="space-y-6 mt-auto">
+                  <div className="space-y-6 mt-auto font-black uppercase italic">
                     {[
-                      { title: 'Clarity First', desc: 'Prioritizing clear communication and intuitive interfaces over decorative elements.' },
-                      { title: 'User-Centered', desc: 'Designing with empathy and focus on real user needs and behaviors.' },
-                      { title: 'Thoughtful Simplicity', desc: 'Reducing complexity to create elegant, purposeful solutions.' },
+                      { title: 'Clarity First', desc: 'Prioritizing clear communication over decoration.' },
+                      { title: 'User-Centered', desc: 'Designing with empathy and focus on real needs.' },
+                      { title: 'Thoughtful Simplicity', desc: 'Reducing complexity to create elegant solutions.' },
                     ].map((item, i) => (
                       <div key={i} className="group">
-                        <h4 className="font-medium flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                        <h4 className="text-2xl flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-[#bef264]"></span>
                           {item.title}
                         </h4>
-                        <p className="text-sm text-muted-foreground mt-1 pl-5">{item.desc}</p>
+                        <p className="text-[10px] tracking-widest text-muted-foreground mt-1 pl-6 normal-case font-medium">{item.desc}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </StickyCard>
 
-              {/* Signature Card */}
-              <StickyCard className="bg-primary/5 rounded-3xl border border-border p-8 text-center relative overflow-hidden mt-8">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-30"></div>
-                <div className="relative z-10">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                    <Sparkles className="w-8 h-8 text-primary" />
+              <StickyCard className="bg-[#bef264]/5 rounded-3xl border border-white/10 p-8 text-center relative overflow-hidden mt-2">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#bef264]/5 to-transparent opacity-30"></div>
+                <div className="relative z-10 text-white">
+                  <div className="w-16 h-16 rounded-full bg-[#bef264]/10 flex items-center justify-center mx-auto mb-6">
+                    <Sparkles className="w-8 h-8 text-[#bef264]" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-3">Intentional Design</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Every detail is considered, every interaction is meaningful, and every solution is crafted with purpose.
+                  <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-3">Intentional Design</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto text-sm font-medium">
+                    Every detail is considered, every interaction is meaningful.
                   </p>
-                  <div className="mt-6">
-                    <span className="inline-block text-sm font-mono border-b border-primary/30 pb-1 text-primary">
-                      Design with intention
-                    </span>
-                  </div>
                 </div>
               </StickyCard>
             </div>
@@ -218,28 +295,22 @@ const BentoGrid = () => {
 
 export default BentoGrid;
 
-// Add global styles for sticky elements
-const style = document.createElement('style');
-style.textContent = `
-  .sticky-element {
-    position: sticky;
-    top: 5%;
-    will-change: transform, opacity;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    backface-visibility: hidden;
-    transform: translateZ(0);
-  }
-  
-  @media (hover: hover) {
+// Global styles for sticky logic
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
     .sticky-element {
-      cursor: none;
+      position: sticky;
+      top: 12%;
+      will-change: transform, opacity;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    
-    .sticky-element:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+    @media (hover: hover) {
+      .sticky-element:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+      }
     }
-  }
-`;
-document.head.appendChild(style);
+  `;
+  document.head.appendChild(style);
+}
