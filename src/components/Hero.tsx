@@ -118,7 +118,7 @@ const Hero = () => {
             </div>
 
             <h1 className="text-6xl md:text-8xl font-bold text-white leading-none">
-              PRAVEENA
+              abcd
             </h1>
 
             {/* DESIGNER ROLE */}

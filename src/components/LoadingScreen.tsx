@@ -15,7 +15,7 @@ const LoadingScreen = ({ onComplete, brandRef, setShowBrand }: LoadingScreenProp
   const [showSubtitle, setShowSubtitle] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [showBorder, setShowBorder] = useState(false);
-  const loadingText = "PRAVEEEEE"; // Must match navbar brand
+  const loadingText = "abc"; // Must match navbar brand
 
   // Simulate real loading progress with rAF (replace with real logic for production)
   useEffect(() => {

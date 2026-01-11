@@ -7,6 +7,7 @@ import BentoGrid from '@/components/BentoGrid';
 import ProjectGallery from '@/components/ProjectGallery';
 import Testimonials from '@/components/Testimonials';
 import AboutDashboard from '@/components/AboutDashboard';
+import Skills from '@/components/Skills';
 import ContactSection from '@/components/ContactSection';
 import AIAssistant from '@/components/AIAssistant';
 import Footer from '@/components/Footer';
@@ -39,6 +40,7 @@ const Index = () => {
         <Hero />
         <BrandsMarquee />
         <BentoGrid />
+        <Skills />
         <ProjectGallery />
         <Testimonials />
         <AboutDashboard />
