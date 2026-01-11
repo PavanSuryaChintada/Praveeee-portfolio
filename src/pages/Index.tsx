@@ -13,6 +13,7 @@ import AIAssistant from '@/components/AIAssistant';
 import Footer from '@/components/Footer';
 import CustomCursor from '@/components/CustomCursor';
 import LoadingScreen from '@/components/LoadingScreen';
+import Certifications from '@/components/Certifications';
 
 const Index = () => {
   useEffect(() => {
@@ -41,6 +42,7 @@ const Index = () => {
         <BrandsMarquee />
         <BentoGrid />
         <Skills />
+        <Certifications />
         <ProjectGallery />
         <Testimonials />
         <AboutDashboard />
