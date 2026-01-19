@@ -8,10 +8,11 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
-  { name: "Home", href: "#hero" },
-  { name: "About", href: "#about" },
+  { name: "Home", href: "/" },
+  { name: "About", href: "/about" },
   { name: "Projects", href: "#projects" },
   { name: "AI-Chat", href: "#ai-chat" },
 ];
@@ -36,11 +37,21 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
     // Expose brand ref for loader → navbar morph
     useImperativeHandle(ref, () => document.querySelector('.brand-span') as HTMLSpanElement | null);
 
+    const location = useLocation();
+    
     const handleNavClick = (href: string) => {
       setIsOpen(false);
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      // Only handle scroll for hash links
+      if (href.startsWith('#')) {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
     };
+    
+    // Close mobile menu when route changes
+    useEffect(() => {
+      setIsOpen(false);
+    }, [location]);
 
     const containerVariants = {
       hidden: { opacity: 0 },
@@ -89,65 +100,50 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
               variants={itemVariants}
             >
               {/* BRAND */}
-              <motion.a
-                href="#hero"
+              <motion.div
                 className="text-xl font-bold text-white relative group"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("#hero");
-                }}
                 variants={itemVariants}
               >
-                <span
-                  ref={ref}
-                  className="relative z-10 block brand-span"
-                  style={{
-                    opacity: showBrand ? 1 : 0,
-                    transition:
-                      "opacity 0.35s cubic-bezier(0.22,1,0.36,1)",
-                  }}
+                <Link 
+                  to="/" 
+                  className="hover:opacity-80 transition-opacity"
+                  onClick={() => handleNavClick("#hero")}
                 >
-                  Praveeee
-                </span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-lime-400 transition-all duration-300 group-hover:w-full" />
-              </motion.a>
+                  <span
+                    ref={ref}
+                    className="relative z-10 block brand-span"
+                    style={{
+                      opacity: showBrand ? 1 : 0,
+                      transition: "opacity 0.35s cubic-bezier(0.22,1,0.36,1)",
+                    }}
+                  >
+                    Praveeee
+                  </span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-lime-400 transition-all duration-300 group-hover:w-full" />
+                </Link>
+              </motion.div>
 
               {/* DESKTOP LINKS */}
               <motion.div
                 className="hidden md:flex items-center space-x-1"
                 variants={itemVariants}
               >
-                {navLinks.map((link, index) => (
-                  <motion.a
-                    key={link.name}
-                    href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavClick(link.href);
-                    }}
-                    onMouseEnter={() => setHoveredLink(index)}
-                    onMouseLeave={() => setHoveredLink(null)}
-                    className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
-                      hoveredLink === index
-                        ? "text-lime-400"
-                        : "text-gray-300 hover:text-white"
-                    }`}
-                  >
-                    {link.name}
-                    {hoveredLink === index && (
-                      <motion.span
-                        layoutId="navHighlight"
-                        className="absolute bottom-0 left-0 w-full h-0.5 bg-lime-400"
-                        transition={{
-                          type: "spring",
-                          bounce: 0.2,
-                          duration: 0.6,
-                        }}
-                      />
-                    )}
-                  </motion.a>
+                {navLinks.map((link, i) => (
+                  <motion.li key={i} variants={mobileMenuVariants}>
+                    <Link
+                      to={link.href}
+                      className="block px-4 py-3 text-lg font-medium text-white/90 hover:text-white transition-colors"
+                      onClick={(e) => {
+                        if (link.href.startsWith('#')) {
+                          e.preventDefault();
+                          handleNavClick(link.href);
+                        }
+                      }}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.li>
                 ))}
-
                 <motion.button
                   className="ml-2 px-4 py-2 bg-lime-400/10 hover:bg-lime-400/20 text-lime-400 rounded-lg border border-lime-400/20 transition-all duration-300 text-sm font-medium"
                   whileHover={{ scale: 1.03 }}

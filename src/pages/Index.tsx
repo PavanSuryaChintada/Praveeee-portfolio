@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import BentoGrid from '@/components/BentoGrid';
 import ProjectGallery from '@/components/ProjectGallery';
 import Testimonials from '@/components/Testimonials';
-import AboutDashboard from '@/components/AboutDashboard';
 import Skills from '@/components/Skills';
 import ContactSection from '@/components/ContactSection';
 import AIAssistant from '@/components/AIAssistant';
@@ -45,7 +44,6 @@ const Index = () => {
         <Certifications />
         <ProjectGallery />
         <Testimonials />
-        <AboutDashboard />
         <ContactSection />
         <Footer />
         <AIAssistant />
