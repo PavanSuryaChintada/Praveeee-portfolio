@@ -5,6 +5,7 @@ import BrandsMarquee from '@/components/BrandsMarquee';
 import { useEffect } from 'react';
 import BentoGrid from '@/components/BentoGrid';
 import ProjectGallery from '@/components/ProjectGallery';
+import Experience from '@/components/Experience';
 import Testimonials from '@/components/Testimonials';
 import Skills from '@/components/Skills';
 import ContactSection from '@/components/ContactSection';
@@ -43,6 +44,7 @@ const Index = () => {
         <Skills />
         <Certifications />
         <ProjectGallery />
+        <Experience />
         <Testimonials />
         <ContactSection />
         <Footer />

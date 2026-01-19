@@ -4,6 +4,7 @@ import { ArrowLeft, Github, Linkedin, Twitter, Mail, Sparkles, Layers, Code, Bru
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import Experience from '@/components/Experience';
 
 const AboutPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -205,7 +206,10 @@ const AboutPage = () => {
           </div>
         </section>
 
-        {/* SECTION 04: THE CONNECTION (Cinematic CTA) */}
+        {/* SECTION 04: EXPERIENCE */}
+        <Experience />
+
+        {/* SECTION 05: THE CONNECTION (Cinematic CTA) */}
         <section className="flex justify-center items-center py-40">
            <motion.div 
              style={{ scale: manifestoScale }}
