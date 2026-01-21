@@ -1,6 +1,37 @@
-import { motion, useTransform, useSpring, useMotionValue, AnimatePresence } from 'framer-motion';
+import { motion, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { useRef, useState, useEffect, useMemo } from 'react';
-import { Palette, PenTool, Layers, Code, ArrowRight, Sparkles } from 'lucide-react';
+import { Palette, PenTool, Layers, Code, ArrowRight, Sparkles, Layout } from 'lucide-react';
+
+// Hook for managing sticky element styles
+const useStickyStyles = () => {
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .sticky-element {
+        position: sticky;
+        top: 12%;
+        will-change: transform, opacity;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @media (hover: hover) {
+        .sticky-element:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+
+    return () => {
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
+};
 
 // --- TECH SPHERE LOGIC ---
 
@@ -9,7 +40,7 @@ const techLogos = [
   { name: "Next.js", url: "https://cdn.simpleicons.org/nextdotjs/white" },
   { name: "TypeScript", url: "https://cdn.simpleicons.org/typescript/3178C6" },
   { name: "Tailwind", url: "https://cdn.simpleicons.org/tailwindcss/06B6D4" },
-  { name: "Framer", url: "https://cdn.simpleicons.org/framer/black" },
+  { name: "Framer", logo: "framer", url: "https://cdn.simpleicons.org/framer/black" },
   { name: "Figma", url: "https://cdn.simpleicons.org/figma/F24E1E" },
   { name: "Node.js", url: "https://cdn.simpleicons.org/nodedotjs/339933" },
   { name: "Three.js", url: "https://cdn.simpleicons.org/threedotjs/white" },
@@ -24,24 +55,28 @@ const techLogos = [
 
 const SphereItem = ({ item, springX, springY, autoRotation }: { item: any; springX: any; springY: any; autoRotation: number }) => {
   const rotationX = useTransform(springY, [-1, 1], [30, -30]);
-  const rotationY = useTransform(springX, (val) => val * 35 + autoRotation);
+  
+  // Calculate horizontal rotation combining mouse and auto-rotation
+  const combinedRotationY = useTransform(springX, (val: number) => val * 35 + autoRotation + item.phi);
 
-  const opacity = useTransform(rotationY, (val) => {
-    const angle = (val + item.phi) * (Math.PI / 180);
+  // Calculate opacity based on depth (Z-axis)
+  const opacity = useTransform(combinedRotationY, (val) => {
+    const angle = val * (Math.PI / 180);
     const z = Math.cos(angle) * item.radius;
-    const depth = (z + 100) / 200;
+    const depth = (z + item.radius) / (2 * item.radius);
     return Math.max(0.1, depth);
   });
 
   const scale = useTransform(opacity, [0.1, 1], [0.5, 1.2]);
-
+  
   return (
     <motion.div
       className="absolute flex items-center justify-center p-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl overflow-hidden"
       style={{
-        x: useTransform(rotationY, (val) => {
-          const rad = (val + item.phi) * (Math.PI / 180);
-          return Math.cos(rad) * Math.sin(item.theta) * item.radius;
+        // Spherical coordinate math
+        x: useTransform(combinedRotationY, (val) => {
+          const rad = val * (Math.PI / 180);
+          return Math.sin(rad) * Math.sin(item.theta) * item.radius;
         }),
         y: useTransform(rotationX, (val) => {
           const rad = val * (Math.PI / 180);
@@ -49,7 +84,6 @@ const SphereItem = ({ item, springX, springY, autoRotation }: { item: any; sprin
         }),
         opacity,
         scale,
-        zIndex: Math.round(opacity.get() * 100),
       }}
     >
       <img 
@@ -74,14 +108,13 @@ const TechSphere = () => {
   useEffect(() => {
     let frameId: number;
     const animate = () => {
-      // Increased base speed to 0.8 and multiplier to 2.5 for a faster revolution
       const speed = 0.8 + (Math.abs(mouseX.get()) * 2.5);
       setAutoRotation((prev) => (prev + speed) % 360);
       frameId = requestAnimationFrame(animate);
     };
     animate();
     return () => cancelAnimationFrame(frameId);
-  }, []);
+  }, [mouseX]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -96,8 +129,9 @@ const TechSphere = () => {
   };
 
   const sphereItems = useMemo(() => {
-    const radius = 115; // Slightly reduced radius to make the rotation feel faster
+    const radius = 115;
     return techLogos.map((logo, i) => {
+      // Golden spiral distribution
       const phi = Math.acos(-1 + (2 * i) / techLogos.length) * (180 / Math.PI);
       const theta = Math.sqrt(techLogos.length * Math.PI) * phi * (Math.PI / 180);
       return { ...logo, phi, theta, radius };
@@ -134,22 +168,19 @@ const AbstractShape = ({ className }: { className?: string }) => (
 );
 
 const StickyCard = ({ children, className = '' }: { children: React.ReactNode, className?: string }) => {
-  const ref = useRef(null);
   return (
-    <motion.div 
-      ref={ref}
-      className={`sticky-element ${className}`}
-    >
+    <motion.div className={`sticky-element ${className}`}>
       {children}
     </motion.div>
   );
 };
 
 const BentoGrid = () => {
+  useStickyStyles();
   const containerRef = useRef<HTMLDivElement>(null);
   
   return (
-    <section ref={containerRef} className="relative py-32 px-6 overflow-hidden min-h-[150vh] bg-background">
+    <section ref={containerRef} className="relative py-32 px-6 overflow-hidden min-h-[150vh] bg-[#050505]">
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Section Header */}
@@ -160,12 +191,12 @@ const BentoGrid = () => {
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 className="text-5xl md:text-7xl font-sans font-bold tracking-tight mb-4 text-white uppercase italic tracking-tighter">
+          <h2 className="text-5xl md:text-7xl font-sans font-bold tracking-tight mb-4 text-white uppercase italic tracking-tighter">
             DESIGN<span className="text-[#bef264]"> PERSPECTIVE</span>
-          </motion.h2>
-          <motion.p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          </h2>
+          <p className="text-lg text-white/40 max-w-2xl mx-auto">
             A thoughtful approach to creating meaningful digital experiences
-          </motion.p>
+          </p>
         </motion.div>
 
         <div className="relative">
@@ -174,8 +205,7 @@ const BentoGrid = () => {
 
           {/* Row 1 */}
           <div className="flex flex-col lg:flex-row gap-6 mb-6">
-            {/* Philosophy Card */}
-            <StickyCard className="lg:w-2/3 bg-card/50 backdrop-blur-md rounded-3xl border border-white/10 p-10 relative overflow-hidden">
+            <StickyCard className="lg:w-2/3 bg-white/[0.03] backdrop-blur-md rounded-[2.5rem] border border-white/10 p-10 relative overflow-hidden">
               <div className="absolute top-8 right-8 text-8xl opacity-5">
                 <Palette className="w-20 h-20 text-white" />
               </div>
@@ -186,18 +216,17 @@ const BentoGrid = () => {
                   <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#bef264]/20 -z-10"></span>
                 </span>
               </h3>
-              <p className="text-lg text-muted-foreground max-w-2xl">
+              <p className="text-lg text-white/50 max-w-2xl">
                 I believe in creating digital experiences that feel effortless. By focusing on clarity and intention, 
                 I design interfaces that guide users naturally to their goals without unnecessary friction or decoration.
               </p>
             </StickyCard>
 
-            {/* Capabilities Card - REVOLVING LOGO SPHERE */}
-            <StickyCard className="lg:w-1/3 bg-card/80 backdrop-blur-sm rounded-3xl border border-white/10 p-8 relative overflow-hidden flex flex-col h-[480px]">
+            <StickyCard className="lg:w-1/3 bg-white/[0.03] backdrop-blur-sm rounded-[2.5rem] border border-white/10 p-8 relative overflow-hidden flex flex-col h-[480px]">
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#bef264]/5 rounded-full"></div>
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-4">
-                  <Layers className="w-6 h-6 text-[#bef264]" />
+                  <Layout className="w-6 h-6 text-[#bef264]" />
                   <h3 className="text-sm font-bold text-white uppercase tracking-widest">Capabilities</h3>
                 </div>
                 
@@ -210,9 +239,7 @@ const BentoGrid = () => {
 
           {/* Row 2 */}
           <div className="flex flex-col lg:flex-row-reverse gap-6">
-            {/* Process Card */}
-            <StickyCard className="lg:w-1/2 bg-card/60 backdrop-blur-sm rounded-3xl border border-white/10 p-8 relative overflow-hidden text-white">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#bef264]/5 rounded-full"></div>
+            <StickyCard className="lg:w-1/2 bg-white/[0.03] backdrop-blur-sm rounded-[2.5rem] border border-white/10 p-8 relative overflow-hidden text-white">
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-8">
                   <Code className="w-6 h-6 text-[#bef264]" />
@@ -234,9 +261,9 @@ const BentoGrid = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium group-hover:text-[#bef264] transition-colors">{item.title}</h4>
-                            <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all" />
+                            <ArrowRight className="w-4 h-4 text-white/30 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all" />
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
+                          <p className="text-sm text-white/40 mt-1">{item.desc}</p>
                         </div>
                       </div>
                       {i < 4 && <div className="h-px bg-white/5 my-4 w-10/12 ml-12"></div>}
@@ -246,10 +273,8 @@ const BentoGrid = () => {
               </div>
             </StickyCard>
 
-            {/* Values & Signature */}
             <div className="lg:w-1/2 flex flex-col gap-6">
-              <StickyCard className="bg-card/70 backdrop-blur-sm rounded-3xl border border-white/10 p-8 flex-1 relative overflow-hidden text-white">
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#bef264]/5 rounded-full"></div>
+              <StickyCard className="bg-white/[0.03] backdrop-blur-sm rounded-[2.5rem] border border-white/10 p-8 flex-1 relative overflow-hidden text-white">
                 <div className="relative z-10 h-full flex flex-col">
                   <div className="flex items-center gap-3 mb-8">
                     <PenTool className="w-6 h-6 text-[#bef264]" />
@@ -266,21 +291,20 @@ const BentoGrid = () => {
                           <span className="w-2 h-2 rounded-full bg-[#bef264]"></span>
                           {item.title}
                         </h4>
-                        <p className="text-[10px] tracking-widest text-muted-foreground mt-1 pl-6 normal-case font-medium">{item.desc}</p>
+                        <p className="text-[10px] tracking-widest text-white/40 mt-1 pl-6 normal-case font-medium">{item.desc}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </StickyCard>
 
-              <StickyCard className="bg-[#bef264]/5 rounded-3xl border border-white/10 p-8 text-center relative overflow-hidden mt-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#bef264]/5 to-transparent opacity-30"></div>
+              <StickyCard className="bg-[#bef264]/5 rounded-[2.5rem] border border-white/10 p-8 text-center relative overflow-hidden mt-2">
                 <div className="relative z-10 text-white">
                   <div className="w-16 h-16 rounded-full bg-[#bef264]/10 flex items-center justify-center mx-auto mb-6">
                     <Sparkles className="w-8 h-8 text-[#bef264]" />
                   </div>
                   <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-3">Intentional Design</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto text-sm font-medium">
+                  <p className="text-white/40 max-w-md mx-auto text-sm font-medium">
                     Every detail is considered, every interaction is meaningful.
                   </p>
                 </div>
@@ -294,23 +318,3 @@ const BentoGrid = () => {
 };
 
 export default BentoGrid;
-
-// Global styles for sticky logic
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = `
-    .sticky-element {
-      position: sticky;
-      top: 12%;
-      will-change: transform, opacity;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @media (hover: hover) {
-      .sticky-element:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
