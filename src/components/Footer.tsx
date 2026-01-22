@@ -110,11 +110,15 @@ const Footer = () => {
       {/* BACK TO TOP KINETIC BUTTON */}
       <motion.button 
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileHover={{ 
+          scale: 1.1, 
+          rotate: 5,
+          backgroundColor: 'rgba(244, 196, 48, 0.3)'
+        }}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-12 right-12 w-16 h-16 rounded-full bg-lime-400 text-black flex items-center justify-center shadow-2xl z-50 group transition-transform"
+        className="fixed bottom-12 left-12 w-16 h-16 rounded-full bg-[rgba(244,196,48,0.2)] backdrop-blur-sm border border-[rgba(13,9,7,0.1)] text-[#0D0907] flex items-center justify-center shadow-lg hover:shadow-[#F4C430]/30 hover:shadow-lg z-50 group transition-all"
       >
-        <ArrowUpRight size={24} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+        <ArrowUpRight size={24} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
       </motion.button>
 
     </footer>

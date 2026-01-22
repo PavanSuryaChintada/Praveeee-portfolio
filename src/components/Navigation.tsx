@@ -94,19 +94,21 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
             <motion.nav
               className={`relative flex items-center justify-between rounded-2xl p-4 transition-all duration-300 ${
                 scrolled
-                  ? "bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg"
-                  : "bg-white/3 backdrop-blur-sm border border-white/5"
+                  ? "bg-[#FAFAFA] backdrop-blur-lg border border-[#0D0907]/10 shadow-lg"
+                  : "bg-[#FAFAFA]/95 backdrop-blur-sm border border-[#0D0907]/5"
               }`}
               variants={itemVariants}
             >
               {/* BRAND */}
               <motion.div
-                className="text-xl font-bold text-white relative group"
+                className="text-2xl font-bold text-[#0D0907] mb-6 relative group"
                 variants={itemVariants}
               >
                 <Link 
                   to="/" 
-                  className="hover:opacity-80 transition-opacity"
+                  className={`text-sm font-medium transition-colors hover:text-[#0D0907] ${
+                    location.pathname === "/" ? 'text-[#0D0907]' : 'text-[#0D0907]/60'
+                  }`}
                   onClick={() => handleNavClick("#hero")}
                 >
                   <span
@@ -119,7 +121,7 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
                   >
                     Praveeee
                   </span>
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-lime-400 transition-all duration-300 group-hover:w-full" />
+                  <span className="w-full h-0.5 bg-[#F4C430] absolute bottom-0 left-0" />
                 </Link>
               </motion.div>
 
@@ -132,7 +134,9 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
                   <motion.li key={i} variants={mobileMenuVariants}>
                     <Link
                       to={link.href}
-                      className="block px-4 py-3 text-lg font-medium text-white/90 hover:text-white transition-colors"
+                      className={`block px-4 py-3 text-lg font-medium text-[#0D0907]/60 hover:text-[#0D0907] transition-colors ${
+                        location.pathname === link.href ? 'text-[#0D0907]' : ''
+                      }`}
                       onClick={(e) => {
                         if (link.href.startsWith('#')) {
                           e.preventDefault();
@@ -145,7 +149,7 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
                   </motion.li>
                 ))}
                 <motion.button
-                  className="ml-2 px-4 py-2 bg-lime-400/10 hover:bg-lime-400/20 text-lime-400 rounded-lg border border-lime-400/20 transition-all duration-300 text-sm font-medium"
+                  className="ml-2 px-4 py-2 bg-[#F4C430]/10 hover:bg-[#F4C430]/20 text-[#F4C430] rounded-lg border border-[#F4C430]/20 transition-all duration-300 text-sm font-medium"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -155,7 +159,7 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
 
               {/* MOBILE TOGGLE */}
               <motion.button
-                className="md:hidden p-2 text-gray-300 hover:text-white"
+                className="md:hidden p-2 text-[#0D0907]/60 hover:text-[#0D0907] transition-colors"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Toggle menu"
                 variants={itemVariants}
@@ -170,7 +174,7 @@ const Navigation = forwardRef<HTMLSpanElement, NavigationProps>(
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className="md:hidden fixed inset-0 z-50 bg-gray-900/95 backdrop-blur-xl pt-24 px-6 pb-8"
+              className="fixed inset-0 bg-[#0D0907]/80 backdrop-blur-sm z-40 pt-24 px-6 pb-8"
               initial="closed"
               animate="open"
               exit="closed"
