@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 82 100% 64%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 53%;
+
+    --accent: 82 100% 64%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 82 100% 64%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 0 0% 2%;
+    --foreground: 60 9% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 60 9% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 60 9% 98%;
+    --primary: 68 100% 52%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 60 9% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 68 100% 52%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 9% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 68 100% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+  }
+
+  html {
+  scroll-behavior: auto;
+}
+
+  ::selection {
+    background: hsl(82, 100%, 64%);
+    color: hsl(0, 0%, 0%);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  .font-sans {
+    font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .font-heading {
+    font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .glassmorphism {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+/* ================================
+   PREMIUM TESTIMONIAL STYLES
+   (matches reference video)
+================================ */
+
+/* Card depth + glass */
+.testimonial-card {
+  background: linear-gradient(
+    180deg,
+    hsl(0 0% 8% / 0.9),
+    hsl(0 0% 5% / 0.95)
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    0 0 0 1px hsl(var(--border) / 0.5);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease,
+    filter 0.6s ease,
+    box-shadow 0.6s ease;
+}
+
+/* Active vs inactive cards */
+.testimonial-card.is-active {
+  filter: blur(0px);
+  opacity: 1;
+  transform: scale(1);
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.8),
+    0 0 0 1px hsl(var(--primary) / 0.35);
+}
+
+.testimonial-card.is-inactive {
+  filter: blur(8px);
+  opacity: 0.35;
+  transform: scale(0.82);
+}
+
+/* Quote text */
+.testimonial-quote {
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+  color: hsl(var(--foreground) / 0.95);
+}
+
+/* Background typography */
+.testimonial-bg-text {
+  opacity: 0.12;
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+.scroll-indicator:hover {
+  opacity: 1;
+}
+
+/* Custom scrollbar (kept intact) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 5%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(0, 0%, 20%);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(68, 100%, 52%);
+}
