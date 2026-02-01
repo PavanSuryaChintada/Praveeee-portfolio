@@ -1,72 +1,59 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 
-const brands = [
-  { name: 'Figma', color: '#F24E1E' },
-  { name: 'Adobe', color: '#FF0000' },
-  { name: 'Sketch', color: '#F7B500' },
-  { name: 'Photoshop', color: '#31A8FF' },
-  { name: 'Illustrator', color: '#FF9A00' },
-  { name: 'After Effects', color: '#9999FF' },
-  { name: 'Blender', color: '#F5792A' },
-  { name: 'Canva', color: '#00C4CC' },
-  { name: 'InVision', color: '#FF3366' },
-  { name: 'Framer', color: '#0055FF' },
-  { name: 'Webflow', color: '#4353FF' },
-  { name: 'Dribbble', color: '#EA4C89' },
+const designDisciplines = [
+  { name: 'UI/UX Design', icon: '◉' },
+  { name: 'Product Design', icon: '◍' },
+  { name: 'Brand Identity', icon: '◈' },
+  { name: 'Visual Design', icon: '◐' },
+  { name: 'Interaction Design', icon: '◑' },
+  { name: 'Design Systems', icon: '◌' },
+  { name: 'Typography', icon: '◔' },
+  { name: 'Creative Direction', icon: '◕' },
+  { name: 'User Research', icon: '◍' },
+  { name: 'Prototyping', icon: '◑' },
+  { name: 'Motion Design', icon: '◐' },
+  { name: 'Design Strategy', icon: '◉' },
 ];
 
-const BrandsMarquee = () => {
+const DesignMarquee = () => {
+  const items = [...designDisciplines, ...designDisciplines]; // Double for seamless loop
+
   return (
-    <section className="py-12 border-y border-border overflow-hidden">
-      <div className="flex items-center">
+    <section className="py-16 border-t border-white/5 bg-gradient-to-b from-transparent to-black/5">
+      <div className="relative overflow-hidden">
         <motion.div
-          className="flex gap-16 whitespace-nowrap"
+          className="flex gap-16 whitespace-nowrap will-change-transform"
           animate={{ x: [0, '-50%'] }}
           transition={{
-            duration: 30,
+            duration: 60, // Slower, more deliberate movement
             repeat: Infinity,
             ease: 'linear',
           }}
         >
-          {[...brands, ...brands].map((brand, i) => (
-            <BrandItem key={`${brand.name}-${i}`} brand={brand} />
+          {items.map((item, i) => (
+            <motion.div
+              key={`${item.name}-${i}`}
+              className="flex items-center gap-3 group"
+              whileHover={{ 
+                y: -2,
+                transition: { type: 'spring', stiffness: 400, damping: 10 }
+              }}
+            >
+              <span className="text-lime-400/60 text-lg font-mono">
+                {item.icon}
+              </span>
+              <span className="text-white/80 text-xl font-sans font-light tracking-wide group-hover:text-white transition-colors">
+                {item.name}
+              </span>
+              <span className="text-lime-400/30 text-2xl">/</span>
+            </motion.div>
           ))}
         </motion.div>
+        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent z-10" />
       </div>
     </section>
   );
 };
 
-const BrandItem = ({ brand }: { brand: { name: string; color: string } }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      className="flex items-center gap-3 cursor-default"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ scale: 1.05 }}
-    >
-      <motion.div
-        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg transition-all duration-300"
-        style={{
-          backgroundColor: isHovered ? brand.color : 'hsl(var(--secondary))',
-          color: isHovered ? '#fff' : 'hsl(var(--muted-foreground))',
-        }}
-      >
-        {brand.name.charAt(0)}
-      </motion.div>
-      <span
-        className="text-xl font-sans font-medium transition-colors duration-300"
-        style={{
-          color: isHovered ? brand.color : 'hsl(var(--muted-foreground))',
-        }}
-      >
-        {brand.name}
-      </span>
-    </motion.div>
-  );
-};
-
-export default BrandsMarquee;
+export default DesignMarquee;

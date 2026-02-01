@@ -114,7 +114,7 @@ const HeroLoader = ({ onComplete }: { onComplete: () => void }) => {
   }, [onComplete]);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full min-h-screen overflow-hidden">
       {/* Curtain */}
       <div 
         ref={curtainRef}

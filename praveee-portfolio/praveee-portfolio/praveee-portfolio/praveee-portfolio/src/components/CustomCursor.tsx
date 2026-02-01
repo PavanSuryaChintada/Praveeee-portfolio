@@ -63,18 +63,50 @@ const CustomCursor = () => {
         }}
       >
         <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2"
+          className="relative -translate-x-1/2 -translate-y-1/2 pointer-events-none"
           animate={{
-            scale: isHovering ? 1 : 0.3,
+            scale: isHovering ? 2.5 : 1,
             opacity: isVisible ? 1 : 0,
           }}
-          transition={{ duration: 0.2 }}
+          transition={{ 
+            type: 'spring',
+            damping: 20,
+            stiffness: 300,
+            mass: 0.2
+          }}
         >
-          <div
-            className={`rounded-full border-2 border-primary ${
-              isHovering ? 'w-12 h-12 bg-transparent' : 'w-3 h-3 bg-primary'
-            } transition-all duration-200`}
-          />
+          <div className="relative">
+            {/* Main cursor dot */}
+            <div 
+              className={`absolute inset-0 rounded-full ${
+                isHovering 
+                  ? 'w-5 h-5 bg-transparent border-2 border-lime-400/80' 
+                  : 'w-3 h-3 bg-lime-400/90'
+              } transition-all duration-300 transform-gpu`}
+              style={{
+                filter: 'drop-shadow(0 0 8px rgba(163, 230, 53, 0.5))',
+                willChange: 'transform, opacity, width, height'
+              }}
+            />
+            
+            {/* Pulse effect on hover */}
+            {isHovering && (
+              <motion.div 
+                className="absolute inset-0 rounded-full bg-lime-400/20"
+                initial={{ scale: 1, opacity: 1 }}
+                animate={{ 
+                  scale: 1.8, 
+                  opacity: 0,
+                }}
+                transition={{ 
+                  duration: 1.5,
+                  repeat: Infinity,
+                  repeatType: 'loop',
+                  ease: 'easeOut'
+                }}
+              />
+            )}
+          </div>
         </motion.div>
       </motion.div>
       <style>{`

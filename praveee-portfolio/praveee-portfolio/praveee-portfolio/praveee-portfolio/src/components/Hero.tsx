@@ -1,348 +1,196 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Twitter, Instagram, Dribbble } from 'lucide-react';
-import { useState, useEffect, useRef, CSSProperties } from 'react';
-import HeroLoader from './HeroLoader';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { Github, Linkedin, Twitter, Instagram, ArrowUpRight } from 'lucide-react';
+import { useRef, useState } from 'react';
 
 const socialLinks = [
-  { icon: Github, href: 'https://github.com', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-  { icon: Dribbble, href: 'https://dribbble.com', label: 'Dribbble' },
+  { icon: Github, label: 'GH' },
+  { icon: Linkedin, label: 'LI' },
+  { icon: Twitter, label: 'TW' },
+  { icon: Instagram, label: 'IG' },
+
+  
 ];
 
-const greetings = [
-  { text: 'Hello', lang: 'English' },
-  { text: 'Bonjour', lang: 'French' },
-  { text: 'Ciao', lang: 'Italian' },
-  { text: 'Hola', lang: 'Spanish' },
-  { text: 'Namaste', lang: 'Hindi' },
+const metadata = [
+  "FAFA9007", "IG ODLNGRLLS 1212122", "REATENTTE", "IG ODCOMPAIT", "PEAS7.03", "OD098LA"
 ];
 
 const Hero = () => {
-  const [greetingIndex, setGreetingIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const heroRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeSkill, setActiveSkill] = useState(0);
+  
+  const { scrollY } = useScroll();
+  const yText = useTransform(scrollY, [0, 500], [0, 80]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGreetingIndex((prev) => (prev + 1) % greetings.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLoaderComplete = () => {
-    setIsLoading(false);
-  };
-
-  const scrollToSection = (id: string) => {
-    const element = document.querySelector(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  if (isLoading) {
-    return <HeroLoader onComplete={handleLoaderComplete} />;
-  }
-
-  // High-end tech aesthetic styles
-  const heroStyle: CSSProperties = {
-    position: 'relative',
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0a',
-    overflow: 'hidden',
-    isolation: 'isolate',
-    '--grid-size': '100px',
-    '--grid-color': 'rgba(163, 230, 53, 0.03)'
-  } as CSSProperties;
-
-  // Button styles with sharp corners
-  const buttonBase: CSSProperties = {
-    padding: '12px 32px',
-    fontSize: '14px',
-    fontWeight: 500,
-    letterSpacing: '0.05em',
-    textTransform: 'uppercase',
-    transition: 'all 0.3s ease',
-    borderRadius: '0',
-    border: 'none',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px'
-  };
-
-  const primaryButtonStyle: CSSProperties = {
-    ...buttonBase,
-    backgroundColor: '#bef264',
-    color: '#000000',
-    border: 'none',
-    ':hover': {
-      backgroundColor: '#d9f99d',
-      transform: 'translateY(-2px)'
-    }
-  };
-
-  const secondaryButtonStyle: CSSProperties = {
-    ...buttonBase,
-    backgroundColor: 'transparent',
-    color: '#ffffff',
-    border: '1px solid #bef264',
-    ':hover': {
-      backgroundColor: 'rgba(190, 242, 100, 0.1)',
-      transform: 'translateY(-2px)'
-    }
-  };
-
-  // Social icon styles with square containers
-  const socialIconStyle: CSSProperties = {
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1a1a1a',
-    color: '#ffffff',
-    borderRadius: '0',
-    transition: 'all 0.3s ease',
-    ':hover': {
-      backgroundColor: '#2a2a2a',
-      transform: 'translateY(-2px)'
-    }
-  };
-
-  // Grid and effects
-  const gridOverlayStyle: CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 0,
-    pointerEvents: 'none',
-    background: [
-      'linear-gradient(to right, var(--grid-color) 1px, transparent 1px)',
-      'linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px)',
-      'radial-gradient(circle at 20% 10%, rgba(190, 242, 100, 0.12) 0%, transparent 600px)'
-    ].join(','),
-    backgroundSize: [
-      'var(--grid-size) var(--grid-size)',
-      'var(--grid-size) var(--grid-size)',
-      '100% 100%'
-    ].join(','),
-    backgroundPosition: [
-      '-1px -1px',
-      '-1px -1px',
-      '0 0'
-    ].join(','),
-    maskImage: 'radial-gradient(circle at 60% 30%, white, transparent 70%)',
-    WebkitMaskImage: 'radial-gradient(circle at 60% 30%, white, transparent 70%)'
-  };
-
-  // Content wrapper with proper z-index and positioning
-  const contentWrapperStyle: CSSProperties = {
-    position: 'relative',
-    zIndex: 1,
-    height: '100%',
-    padding: '80px 0',
-    display: 'flex',
-    alignItems: 'center'
-  };
+  const skillData = [
+    { label: "Py", color: "#F4C430", text: "Python & AI logic automation expert." },
+    { label: "UI", color: "#F4C430", text: "Figma to High-Fidelity interactive prototypes." },
+    { label: "Dev", color: "#F4C430", text: "Fullstack MERN with Agentic AI workflows." }
+  ];
 
   return (
     <section 
-      ref={heroRef}
-      id="hero" 
-      style={heroStyle}
-      className="relative"
+      ref={containerRef}
+      className="relative min-h-screen bg-[#FAFAFA] overflow-hidden flex flex-col selection:bg-[#F4C430] selection:text-[#0D0907]"
     >
-      {/* Grid and effects overlay */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 0,
-          pointerEvents: 'none',
-          background: [
-            'linear-gradient(to right, var(--grid-color) 1px, transparent 1px)',
-            'linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px)',
-            'radial-gradient(circle at 90% 20%, rgba(190, 242, 100, 0.12) 0%, transparent 600px)'
-          ].join(','),
-          backgroundSize: [
-            'var(--grid-size) var(--grid-size)',
-            'var(--grid-size) var(--grid-size)',
-            '100% 100%'
-          ].join(','),
-          backgroundPosition: [
-            '-1px -1px',
-            '-1px -1px',
-            '0 0'
-          ].join(','),
-          maskImage: 'radial-gradient(circle at 60% 30%, white, transparent 70%)',
-          WebkitMaskImage: 'radial-gradient(circle at 60% 30%, white, transparent 70%)'
-        }}
-      />
-      
-      {/* Glossy overlay */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'radial-gradient(circle at 10% 20%, rgba(190, 242, 100, 0.12) 0%, transparent 600px)',
-          zIndex: 0,
-          pointerEvents: 'none'
-        }}
-      />
-      
-      <div style={contentWrapperStyle} className="container mx-auto px-6 h-full">
-        <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          {/* Content - Left Side */}
-          <div className="order-2 lg:order-1">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              {/* Greeting */}
-              <div className="h-16 mb-4 overflow-hidden">
+      {/* 1. TOP GHOST TYPOGRAPHY HEADER */}
+      <div className="relative h-[38vh] w-full flex flex-col justify-center items-center border-b border-[#0D0907]/10 bg-white overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+             style={{ backgroundImage: `radial-gradient(#0D0907 0.5px, transparent 0.5px)`, backgroundSize: '24px 24px' }} />
+        
+        <motion.h2 style={{ y: yText }} className="text-[15vw] font-black italic outline-text-ghost leading-none uppercase tracking-tighter">
+          -------
+        </motion.h2>
+        <motion.h2 style={{ y: useTransform(scrollY, [0, 500], [0, -40]) }} className="text-[15vw] font-black italic outline-text-ghost leading-none uppercase tracking-tighter -mt-6">
+          Designer
+        </motion.h2>
+      </div>
+
+      {/* 2. SUB-HEADER METADATA BAR */}
+      <div className="w-full py-4 border-b border-[#0D0907]/10 flex justify-center gap-10 bg-white overflow-hidden px-6">
+        {metadata.map((text, i) => (
+          <span key={i} className="text-[10px] font-bold text-[#0D0907]/50 hover:text-[#F4C430] font-mono flex items-center gap-2 whitespace-nowrap uppercase tracking-tight transition-colors duration-200 group">
+             <div className="w-3.5 h-3.5 border border-[#0D0907]/20 group-hover:border-[#F4C430] rounded-sm transition-colors duration-200" /> {text}
+          </span>
+        ))}
+      </div>
+
+      {/* 3. MAIN CONTENT GRID */}
+      <div className="flex-grow grid lg:grid-cols-12 relative h-full">
+        
+        {/* LEFT BLACK SIDEBAR */}
+        <div className="lg:col-span-1 border-r border-[#0D0907]/10 flex flex-col justify-between items-center py-12 bg-[#0D0907] text-white">
+          <div className="flex flex-col gap-7">
+            {socialLinks.map(({ icon: Icon, label }, i) => (
+              <a 
+                key={i} 
+                href="#" 
+                className="flex flex-col items-center gap-1 group transition-all duration-300"
+              >
+                <div className="p-2 rounded-full group-hover:bg-[#F4C430]/10 group-hover:shadow-[0_0_15px_rgba(244,196,48,0.5)] transition-all duration-300">
+                  <Icon size={20} className="text-white group-hover:text-[#F4C430] transition-colors duration-300" />
+                </div>
+                <span className="text-[9px] font-black text-white/40 group-hover:text-[#F4C430] uppercase tracking-tighter transition-colors duration-300">
+                  {label}
+                </span>
+              </a>
+            ))}
+          </div>
+          <div className="vertical-text text-[12px] font-black text-white/60 uppercase tracking-[0.5em] italic pb-8">
+            Est // 2026
+          </div>
+        </div>
+
+        {/* CENTER TEXT BLOCK */}
+        <div className="lg:col-span-6 flex flex-col justify-center px-16 lg:px-24 py-16 z-20">
+          <div className="space-y-10">
+            <div className="flex flex-col gap-4">
+               <div className="w-24 h-2 bg-[#0D0907] rounded-full flex overflow-hidden">
+                  <div className="w-[70%] h-full bg-[#F4C430]" />
+               </div>
+               <span className="bg-[#F4C430] text-[#0D0907] text-[11px] font-black px-3 py-1 italic w-fit uppercase tracking-tighter">
+                  System.Initialize // Active
+               </span>
+            </div>
+
+            <h1 className="flex flex-col leading-[0.8] tracking-tighter">
+              <span className="text-[7.5vw] font-black text-[#0D0907] uppercase italic relative">
+                Praveena <span className="text-3xl absolute top-0 italic font-light">®</span>
+              </span>
+              <span className="text-[6.5vw] font-black italic outline-text-main uppercase -mt-1">
+                Rudrakshula
+              </span>
+              <div className="w-[180px] h-[1.5px] bg-[#0D0907] mt-6 opacity-30" />
+            </h1>
+
+            <div className="flex flex-col gap-10 pt-6">
+              {/* REFINED CIRCULAR BUTTONS (DECREASED SIZE) */}
+              <div className="flex items-center gap-6 group text-left outline-none min-h-[60px]">
+                <div className="flex gap-2.5">
+                  {skillData.map((skill, index) => (
+                    <button 
+                      key={index}
+                      onClick={() => setActiveSkill(index)}
+                      className="flex flex-col items-center gap-1.5 group outline-none"
+                    >
+                      <motion.div 
+                        animate={{ 
+                          scale: activeSkill === index ? 1.1 : 1,
+                          borderColor: activeSkill === index ? "#F4C430" : "#0D0907"
+                        }}
+                        className={`w-11 h-11 rounded-full border-2 flex items-center justify-center p-1 transition-all shadow-sm ${activeSkill === index ? 'bg-[#0D0907]/5' : ''}`}
+                      >
+                         <div className="w-full h-full bg-[#F4C430]/10 rounded-full flex items-center justify-center">
+                            <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activeSkill === index ? 'bg-[#F4C430] scale-125' : 'bg-[#0D0907]/30'}`} />
+                         </div>
+                      </motion.div>
+                      <span className={`text-[8px] font-black uppercase tracking-widest transition-colors ${activeSkill === index ? 'text-[#F4C430]' : 'text-[#0D0907]/40'}`}>
+                        {skill.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="h-8 w-[1px] bg-[#0D0907]/10 mx-1" />
+
                 <AnimatePresence mode="wait">
-                  <motion.p
-                    key={greetingIndex}
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -40, opacity: 0 }}
-                    transition={{ duration: 0.5, ease: 'easeInOut' }}
-                    className="text-2xl font-mono text-primary"
+                  <motion.p 
+                    key={activeSkill}
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 5 }}
+                    className="text-[12px] font-black leading-tight text-[#0D0907]/70 uppercase tracking-tighter w-48"
                   >
-                    {greetings[greetingIndex].text}, I'm
+                    {skillData[activeSkill].text}
                   </motion.p>
                 </AnimatePresence>
               </div>
 
-              {/* Name */}
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                <span className="text-white">Anish</span>
-              </h1>
-
-              {/* Role */}
-              <p className="text-xl text-gray-300 mb-8 max-w-lg">
-                Full Stack Developer & UI/UX Designer
-              </p>
-
-              {/* Buttons */}
-              <div className="flex flex-wrap gap-4 mb-12">
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  style={primaryButtonStyle}
-                >
-                  View My Work
-                </motion.button>
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  style={secondaryButtonStyle}
-                >
-                  Contact Me
-                </motion.button>
-              </div>
-
-              {/* Social Icons */}
+              {/* ACTION BUTTONS */}
               <div className="flex gap-4">
-                {socialLinks.map((social, index) => {
-                  const Icon = social.icon;
-                  return (
-                    <motion.a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#1a1a1a',
-                        color: '#ffffff',
-                        borderRadius: '0',
-                        transition: 'all 0.3s ease'
-                      }}
-                      whileHover={{ 
-                        y: -3, 
-                        backgroundColor: '#2a2a2a',
-                        transition: { duration: 0.2 }
-                      }}
-                      aria-label={social.label}
-                    >
-                      <Icon size={20} />
-                    </motion.a>
-                  );
-                })}
+                <button className="bg-[#0D0907] text-white px-9 py-3.5 rounded-full font-black text-[10px] uppercase flex items-center gap-3 group relative overflow-hidden transition-all hover:bg-[#F4C430] hover:text-[#0D0907]">
+                  View Work <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </button>
+                <button className="border-2 border-[#0D0907] text-[#0D0907] px-9 py-3.5 rounded-full font-black text-[10px] uppercase transition-all hover:bg-[#F4C430] hover:border-[#F4C430] hover:text-[#0D0907]">
+                  Available
+                </button>
               </div>
-            </motion.div>
-          </div>
-
-          {/* Image - Right Side */}
-          <motion.div 
-            className="relative order-1 lg:order-2"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: '500px',
-              marginLeft: 'auto'
-            }}>
-              {/* Offset background */}
-              <div style={{
-                position: 'absolute',
-                top: '10px',
-                left: '-10px',
-                right: '10px',
-                bottom: '-10px',
-                backgroundColor: '#bef264',
-                clipPath: 'polygon(0% 15%, 15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%)',
-                zIndex: 0,
-              }} />
-              <motion.div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '100%',
-                  clipPath: 'polygon(0% 15%, 15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%)',
-                  zIndex: 1,
-                  backgroundColor: '#0a0a0a',
-                  overflow: 'hidden'
-                } as React.CSSProperties}
-                animate={{ 
-                  y: [0, -15, 0],
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-                  <span className="text-7xl md:text-9xl font-bold text-primary">A</span>
-                </div>
-              </motion.div>
+              
+              <div className="flex flex-col border-l-[2px] border-[#F4C430] pl-5">
+                 <span className="text-[9px] font-black text-[#F4C430] uppercase tracking-[0.3em]">Region</span>
+                 <span className="text-[12px] font-black text-[#0D0907] font-mono tracking-tighter uppercase">Andhra Pradesh, India</span>
+              </div>
             </div>
-          </motion.div>
+          </div>
+        </div>
 
+        {/* RIGHT PORTRAIT SECTION (REMOVED BACKGROUND AND FLOATING BOXES) */}
+        <div className="lg:col-span-5 relative flex items-center justify-center p-16 z-10">
+           <div className="relative w-full max-w-[460px]">
+              
+              {/* Minimalist Image Container */}
+              <div className="aspect-square rounded-[80px] bg-transparent overflow-hidden border-[12px] border-white shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] relative group">
+                  <div className="w-full h-full bg-[#F5F5F5] flex items-center justify-center">
+                    <span className="text-[#0D0907]/10 font-black text-[10vw] italic tracking-tighter select-none">PRVN</span>
+                  </div>
+                  {/* Glowing Subtle Ring */}
+                  <div className="absolute inset-0 border-[30px] border-[#F4C430]/5 rounded-full pointer-events-none" />
+              </div>
+
+              {/* SCROLL INDICATOR (SUBTLE) */}
+              <div className="absolute bottom-4 -right-10 flex flex-col items-center gap-4">
+                 <span className="vertical-text text-[9px] font-black text-[#F4C430] uppercase tracking-[0.4em]">Scroll</span>
+                 <div className="w-[1px] h-12 bg-gradient-to-b from-[#F4C430] to-transparent" />
+              </div>
+           </div>
+        </div>
       </div>
-      </div>
+
+      <style>{`
+        .vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); }
+        .outline-text-ghost { -webkit-text-stroke: 1.5px rgba(13, 9, 7, 0.12); color: transparent; }
+        .outline-text-main { -webkit-text-stroke: 1.5px rgba(13, 9, 7, 0.22); color: transparent; }
+      `}</style>
     </section>
   );
 };

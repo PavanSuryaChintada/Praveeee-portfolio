@@ -50,12 +50,15 @@ const AIAssistant = () => {
       {/* Floating Orb */}
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-primary flex items-center justify-center animate-pulse-glow"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-[#F4C430] flex items-center justify-center shadow-lg hover:shadow-[#F4C430]/50 hover:shadow-lg transition-all"
+        whileHover={{ 
+          scale: 1.1,
+          backgroundColor: 'rgba(244, 196, 48, 0.9)'
+        }}
+        whileTap={{ scale: 0.95 }}
         data-cursor="hover"
       >
-        <MessageCircle className="text-primary-foreground" size={28} />
+        <MessageCircle className="text-[#0D0907]" size={28} />
       </motion.button>
 
       {/* Chat Panel */}
